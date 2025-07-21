@@ -1,7 +1,8 @@
 # main.py
 import time
 from futu import OpenQuoteContext, SubType, RET_OK
-from handlers import MultiHandler
+from handlers import StockQuoteHandleImpl, OrderBookHandleImpl, CurKlineHandleImpl, RTDataHandleImpl, TickerHandleImpl, BrokerHandlerImpl
+
 
 def main():
     host = '127.0.0.1'
@@ -15,18 +16,28 @@ def main():
     ]
     sub_types = [
         SubType.QUOTE,
-        SubType.K_DAY,
+        SubType.BROKER,
         SubType.K_1M,
-        SubType.TICKER,
-        SubType.ORDER_BOOK,
         SubType.RT_DATA,
+        SubType.TICKER,
         SubType.BROKER
     ]
 
     # 1. 建立连接，注册 Handler
     ctx = OpenQuoteContext(host=host, port=port)
-    handler = MultiHandler()
-    ctx.set_handler(handler)  # 只调用一次
+    stock_quote = StockQuoteHandleImpl()
+    order_book = OrderBookHandleImpl()
+    kline = CurKlineHandleImpl()
+    rt_data = RTDataHandleImpl()
+    tick = TickerHandleImpl()
+    broker = BrokerHandlerImpl()
+
+    ctx.set_handler(stock_quote)
+    ctx.set_handler(order_book)
+    ctx.set_handler(kline)
+    ctx.set_handler(rt_data)
+    ctx.set_handler(tick)
+    ctx.set_handler(broker)
 
     # 2. 一次性订阅所有类型
     ret, err = ctx.subscribe(symbols, sub_types)
