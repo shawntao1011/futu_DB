@@ -1,30 +1,14 @@
 # main.py
 import time
-from futu import OpenQuoteContext, SubType, RET_OK
+from futu import OpenQuoteContext, RET_OK
+from config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
 from handlers import StockQuoteHandleImpl, OrderBookHandleImpl, CurKlineHandleImpl, RTDataHandleImpl, TickerHandleImpl, BrokerHandlerImpl
 
 
 def main():
-    host = '127.0.0.1'
-    port = 11111
-    symbols = [
-        # 稳定币
-        'HK.01428',  # 耀才证券金融
-
-        # 创新药
-        'HK.01530',  # 三生制药
-    ]
-    sub_types = [
-        SubType.QUOTE,
-        SubType.BROKER,
-        SubType.K_1M,
-        SubType.RT_DATA,
-        SubType.TICKER,
-        SubType.BROKER
-    ]
 
     # 1. 建立连接，注册 Handler
-    ctx = OpenQuoteContext(host=host, port=port)
+    ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
     stock_quote = StockQuoteHandleImpl()
     order_book = OrderBookHandleImpl()
     kline = CurKlineHandleImpl()
@@ -40,7 +24,7 @@ def main():
     ctx.set_handler(broker)
 
     # 2. 一次性订阅所有类型
-    ret, err = ctx.subscribe(symbols, sub_types)
+    ret, err = ctx.subscribe(SYMBOLS, SUB_TYPES)
     if ret != RET_OK:
         print("Subscribe failed:", err)
         return
