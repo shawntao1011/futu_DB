@@ -49,15 +49,14 @@ def main():
     # 3. 启动接收（内部会自动 spawn 线程）
     ctx.start()
 
-    # 4. 等待一会儿，让回调跑起来
+    print("▶️ 运行中…按 Ctrl+C 停止")
     try:
-        time.sleep(15)
+        while True:
+            time.sleep(1)  # 每秒醒一次，可做心跳或状态打印
     except KeyboardInterrupt:
-        pass
-
-    # 5. 关闭
-    print("🛑 关闭连接")
-    ctx.close()
+        print("🛑 程序中断，正在关闭…")
+    finally:
+        ctx.close()
 
 if __name__ == "__main__":
     main()
