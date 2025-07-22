@@ -2,6 +2,7 @@
 import time
 from futu import OpenQuoteContext, RET_OK
 from config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
+from feedTo.tp_publisher import TPPublisher
 from handlers import StockQuoteHandleImpl, OrderBookHandleImpl, CurKlineHandleImpl, RTDataHandleImpl, TickerHandleImpl, BrokerHandlerImpl
 
 
@@ -9,12 +10,15 @@ def main():
 
     # 1. 建立连接，注册 Handler
     ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
-    stock_quote = StockQuoteHandleImpl()
-    order_book = OrderBookHandleImpl()
-    kline = CurKlineHandleImpl()
-    rt_data = RTDataHandleImpl()
-    tick = TickerHandleImpl()
-    broker = BrokerHandlerImpl()
+
+    publisher = TPPublisher()
+
+    stock_quote = StockQuoteHandleImpl(publisher)
+    order_book = OrderBookHandleImpl(publisher)
+    kline = CurKlineHandleImpl(publisher)
+    rt_data = RTDataHandleImpl(publisher)
+    tick = TickerHandleImpl(publisher)
+    broker = BrokerHandlerImpl(publisher)
 
     ctx.set_handler(stock_quote)
     ctx.set_handler(order_book)
