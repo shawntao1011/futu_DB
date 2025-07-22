@@ -37,6 +37,8 @@ sym
 hdb/
 tick/
 .qpc/
+samples/
+vanila_tick/
 
 #----------------------------------------
 # Python

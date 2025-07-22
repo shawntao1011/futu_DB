@@ -16,11 +16,9 @@ SYMBOLS = [
     'HK.01177', # 中国生物制药
 ]
 
-SUB_TYPES = [
-    SubType.QUOTE,
-    SubType.K_DAY,
+SUB_TYPES: list[str] = [
     SubType.K_1M,
     SubType.TICKER,
     SubType.ORDER_BOOK,
-    SubType.RT_DATA,
+    SubType.BROKER,
 ]

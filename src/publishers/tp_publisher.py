@@ -10,3 +10,6 @@ class TPPublisher:
     def __init__(self, queue: Queue | None = None) -> None:
         self.queue = queue or Queue()
         self.logger = logging.getLogger(__name__)
+
+    def publish(self, payload: any):
+        raise NotImplementedError

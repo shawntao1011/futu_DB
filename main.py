@@ -2,8 +2,15 @@
 import time
 from futu import OpenQuoteContext, RET_OK
 from config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
-from feedTo.tp_publisher import TPPublisher
-from handlers import StockQuoteHandleImpl, OrderBookHandleImpl, CurKlineHandleImpl, RTDataHandleImpl, TickerHandleImpl, BrokerHandlerImpl
+from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
+from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
+from src.handlers.cur_kline_handler import CurKlineHandlerImpl
+from src.handlers.order_book_handler import OrderBookHandlerImpl
+from src.handlers.ticker_handler import TickerHandlerImpl
+from src.publishers.tp_publisher import TPPublisher
+from src.transformers.broker_queue_transformer import BrokerQueueTransformer
+from src.transformers.order_book_transformer import OrderBookTransformer
 
 
 def main():
@@ -11,19 +18,43 @@ def main():
     # 1. 建立连接，注册 Handler
     ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
 
-    publisher = TPPublisher()
+    tpPublisher = TPPublisher()
 
-    stock_quote = StockQuoteHandleImpl(publisher)
-    order_book = OrderBookHandleImpl(publisher)
-    kline = CurKlineHandleImpl(publisher)
-    rt_data = RTDataHandleImpl(publisher)
-    tick = TickerHandleImpl(publisher)
-    broker = BrokerHandlerImpl(publisher)
+    dictToPykxFormatter = DictToPykxFormatter()
+    dfToPykxFormatter = DFToPykxFormatter()
 
-    ctx.set_handler(stock_quote)
+    # order_book
+    order_book = OrderBookHandlerImpl(
+        transformer=OrderBookTransformer(),
+        formatter=dictToPykxFormatter,
+        publisher=tpPublisher
+    )
+
+    # minutes
+    kline = CurKlineHandlerImpl(
+        transformer=None,
+        formatter=dfToPykxFormatter,
+        publisher=tpPublisher
+    )
+
+    # ticks
+    tick = TickerHandlerImpl(
+        transformer=None,
+        formatter=dfToPykxFormatter,
+        publisher=tpPublisher
+    )
+
+    # broker queue
+    broker = BrokerQueueHandlerImpl(
+        transformer=BrokerQueueTransformer(),
+        formatter=dfToPykxFormatter,
+        publisher=tpPublisher
+    )
+
+
+    # set all callbacks
     ctx.set_handler(order_book)
     ctx.set_handler(kline)
-    ctx.set_handler(rt_data)
     ctx.set_handler(tick)
     ctx.set_handler(broker)
 
@@ -33,7 +64,7 @@ def main():
         print("Subscribe failed:", err)
         return
 
-    print("⏳ 订阅成功，开始接收推送，15秒后自动退出…")
+    print("⏳ 订阅成功，开始接收推送")
     # 3. 启动接收（内部会自动 spawn 线程）
     ctx.start()
 
