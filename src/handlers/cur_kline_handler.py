@@ -2,11 +2,11 @@ import logging
 import pykx as kx
 
 from futu import CurKlineHandlerBase, RET_OK, RET_ERROR
-from jsonschema.exceptions import ValidationError
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, ValidationError
 
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.models.cur_kline_model import CurKlineModel
+from src.models.cur_kline_model import FIELD_MAP as ckline_field_map
 from src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
         self.transformer = transformer
         self.formatter = formatter
         self.publisher = publisher
+
+        self.field_map = ckline_field_map
 
     def on_recv_rsp(self, rsp_pb):
         ret_code, data = super(CurKlineHandlerImpl, self).on_recv_rsp(rsp_pb)
@@ -42,12 +44,10 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
             tbl = self.formatter.format(
                 data,
                 ktype={
-                    'code': kx.SymbolAtom,
-                    'name': kx.CharVector,
                     'time_key': kx.TimestampAtom,
                 },
                 time_fields=['time_key'],
-                parse_times=True
+                field_map=self.field_map
             )
         except Exception as e:
             logger.error("format to pykx table failed: %s", e)

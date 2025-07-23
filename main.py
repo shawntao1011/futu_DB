@@ -1,7 +1,7 @@
 # main.py
 import time
 from futu import OpenQuoteContext, RET_OK
-from config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
+from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
 from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl

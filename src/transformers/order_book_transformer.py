@@ -32,9 +32,9 @@ class OrderBookTransformer:
             entries = raw.get(side) or []
             for i in range(1, self.depth + 1):
                 try:
-                    price, volume, qty = entries[i-1]
+                    price, volume, qty, _ = entries[i-1]
                 except IndexError:
-                    price, volume, qty = None, None, None
+                    price, volume, qty, _ = None, None, None
 
                 flat[f"{side.lower()}{i}_price"] = price
                 flat[f"{side.lower()}{i}_volume"] = volume

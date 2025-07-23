@@ -7,7 +7,7 @@ import pickle
 from datetime import datetime
 
 from futu import StockQuoteHandlerBase, RET_OK, RET_ERROR
-from jsonschema import ValidationError
+from pydantic import ValidationError
 
 from src.models.stock_quote_model import StockQuoteModel
 from src.publishers.tp_publisher import TPPublisher

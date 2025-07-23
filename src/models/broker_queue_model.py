@@ -35,3 +35,16 @@ class BrokerQueueModel(CleanModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+# kdb q field map
+FIELD_MAP = {
+    "code":         "sym",
+    "name":         "name",
+    "time":         "time",
+    "broker_id":    "brokerId",
+    "broker_name":  "brokerName",
+    "broker_pos":   "brokerPos",
+    "order_id":     "orderId",
+    "order_volume": "orderVolume",
+    "side":         "side",
+}

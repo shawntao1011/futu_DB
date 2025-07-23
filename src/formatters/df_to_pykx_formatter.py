@@ -15,12 +15,18 @@ class DFToPykxFormatter:
             df: pd.DataFrame,
             ktype: Optional[dict[str, Any]] = None,
             time_fields: Optional[list[str]] = None,
-            parse_times: Optional[bool] = None
+            field_map: Optional[dict[str, str]] = None
     ) -> kx.Table:
 
-        if parse_times:
+        if time_fields:
             for col in time_fields:
                 df[col] = pd.to_datetime(df[col])
 
-        tbl = kx.toq(df, ktype=ktype)
-        return tbl
+        if field_maps:
+            df.rename(columns=field_maps, inplace=True)
+
+        if ktype:
+            return kx.toq(df, ktype=ktype)
+        else:
+            return kx.toq(df)
+

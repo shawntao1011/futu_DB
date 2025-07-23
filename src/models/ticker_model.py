@@ -14,3 +14,16 @@ class TickerModel(CleanModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+FIELD_MAP = {
+    "code"              :"sym",
+    "name"              :"name",
+    "time"              :"time",
+    "price"             :"price",
+    "volume"            :"volume",
+    "turnover"          :"turnover",
+    "ticker_direction"  :"tickDirection",
+    "type"              :"tickType",
+    "push_data_type"    :"srcType",
+}

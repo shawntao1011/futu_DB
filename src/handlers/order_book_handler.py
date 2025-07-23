@@ -1,10 +1,11 @@
 import logging
 
 from futu import OrderBookHandlerBase, RET_ERROR, RET_OK
-from jsonschema import ValidationError
+from pydantic import ValidationError
 
 from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
 from src.models.orderbook_model import OrderBookModel
+from src.models.orderbook_model import FIELD_MAP as ob_field_map
 from src.publishers.tp_publisher import TPPublisher
 from src.transformers.order_book_transformer import OrderBookTransformer
 
@@ -24,6 +25,8 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
         self.transformer = transformer
         self.formatter = formatter
         self.publisher = publisher
+
+        self.field_map = ob_field_map
 
 
     def on_recv_rsp(self, rsp_pb):
@@ -51,13 +54,11 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
             tbl = self.formatter.format(
                 flat,
                 ktype={
-                    'code': kx.SymbolAtom,
-                    'name': kx.CharVector,
                     'svr_recv_time_bid': kx.TimestampAtom,
                     'svr_recv_time_ask': kx.TimestampAtom,
                 },
                 time_fields=['svr_recv_time_bid', 'svr_recv_time_ask'],
-                parse_times=True
+                field_map=self.field_map
             )
         except Exception as e:
             logger.error("format to pykx table failed: %s", e)

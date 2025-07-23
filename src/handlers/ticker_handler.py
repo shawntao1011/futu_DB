@@ -2,11 +2,11 @@ import logging
 import pykx as kx
 
 from futu import TickerHandlerBase, RET_OK, RET_ERROR
-from jsonschema import ValidationError
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, ValidationError
 
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.models.ticker_model import TickerModel
+from src.models.ticker_model import FIELD_MAP as tick_field_map
 from src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ class TickerHandlerImpl(TickerHandlerBase):
         self.transformer = transformer
         self.formatter = formatter
         self.publisher = publisher
+
+        self.field_map = tick_field_map
 
     def on_recv_rsp(self, rsp_pb):
         ret_code, data = super(TickerHandlerImpl, self).on_recv_rsp(rsp_pb)
@@ -42,12 +44,10 @@ class TickerHandlerImpl(TickerHandlerBase):
             tbl = self.formatter.format(
                 data,
                 ktype={
-                    'code': kx.SymbolAtom,
-                    'name': kx.CharVector,
                     'time': kx.TimestampAtom,
                 },
                 time_fields=['time'],
-                parse_times=True
+                field_map=self.field_map
             )
         except Exception as e:
             logger.error("format to pykx table failed: %s", e)

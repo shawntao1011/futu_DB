@@ -26,8 +26,11 @@ class RTDataHandleImpl(RTDataHandlerBase):
             return RET_ERROR, data
 
         for rec in data.to_dict('records'):
-            rtdm = RTDataModel(**rec)
-            print(rtdm)
+            from pydantic import ValidationError
+            try:
+                rtdm = RTDataModel(**rec)
+            except ValidationError as err:
+                logger.warning("invalid real time record: %s", rec)
             self._buffer_and_maybe_flush(rtdm)
 
         return RET_OK, data
