@@ -1,4 +1,4 @@
-from src.models.clean_model import CleanModel
+from feedhandler.src.models.clean_model import CleanModel
 
 
 class CurKlineModel(CleanModel):
@@ -9,7 +9,7 @@ class CurKlineModel(CleanModel):
     close : float
     high : float
     low : float
-    volume : int
+    volume : float
     turnover : float
     pe_ratio : float
     turnover_rate : float
@@ -22,14 +22,15 @@ class CurKlineModel(CleanModel):
 # kdb q field map
 FIELD_MAP = {
     "code":         "sym",
-    "name":         "name",
     "time_key":     "time",
+    "name":         "name",
     "open":         "open",
     "close":        "close",
     "high":         "high",
     "low":          "low",
     "volume":       "volume",
     "turnover":     "turnover",
+    "k_type":       "kType",
     "pe_ratio":     "peRatio",
     "turnover_rate":"turnoverRate",
     "last_close":   "lastClose",

@@ -51,23 +51,20 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
 
         # format to pykx table
         try:
-            tbl = self.formatter.format(
+            record = self.formatter.format(
                 flat,
-                ktype={
-                    'svr_recv_time_bid': kx.TimestampAtom,
-                    'svr_recv_time_ask': kx.TimestampAtom,
-                },
+                None,
                 time_fields=['svr_recv_time_bid', 'svr_recv_time_ask'],
-                field_map=self.field_map
+                field_map=self.field_map,
             )
         except Exception as e:
             logger.error("format to pykx table failed: %s", e)
             return RET_ERROR, None
 
         try:
-            self.publisher.publish(tbl)
+            self.publisher.publish("OrderBooks", record)
         except Exception as e:
-            logger.error("publish table failed: %s", e)
+            logger.error("publish record failed: %s", e)
             return RET_ERROR, None
 
         return RET_OK, data

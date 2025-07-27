@@ -4,11 +4,11 @@ import pykx as kx
 from futu import BrokerHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
-from src.models.broker_queue_model import BrokerBidEntry, BrokerAskEntry
-from src.models.broker_queue_model import FIELD_MAP as bq_field_map
-from src.publishers.tp_publisher import TPPublisher
-from src.transformers.broker_queue_transformer import BrokerQueueTransformer
+from feedhandler.src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from feedhandler.src.models.broker_queue_model import BrokerBidEntry, BrokerAskEntry
+from feedhandler.src.models.broker_queue_model import FIELD_MAP as bq_field_map
+from feedhandler.src.publishers.tp_publisher import TPPublisher
+from feedhandler.src.transformers.broker_queue_transformer import BrokerQueueTransformer
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
             return RET_ERROR, None
 
         try:
-            self.publisher.publish(tbl)
+            self.publisher.publish("FlatBrokerQs", tbl)
         except Exception as e:
             logger.error("publish table failed: %s", e)
             return RET_ERROR, None

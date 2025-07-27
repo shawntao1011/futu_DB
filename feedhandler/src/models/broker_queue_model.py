@@ -1,5 +1,4 @@
-from src.models.clean_model import CleanModel
-
+from feedhandler.src.models.clean_model import CleanModel
 
 class BrokerBidEntry(CleanModel):
     """买盘经纪队列一行"""
@@ -7,9 +6,9 @@ class BrokerBidEntry(CleanModel):
     name: str                   # 证券名称
     bid_broker_id: int | None   # 买方经纪商 ID
     bid_broker_name: str | None # 买方经纪商名称
-    bid_broker_pos: int | None  # 买方席位级别
+    bid_broker_pos: float | None  # 买方席位级别
     order_id: int | None        # 交易所订单号
-    order_volume: int | None    # 订单未成交量
+    order_volume: float | None    # 订单未成交量
 
     class Config:
         arbitrary_types_allowed = True
@@ -20,9 +19,9 @@ class BrokerAskEntry(CleanModel):
     name: str
     ask_broker_id: int | None
     ask_broker_name: str | None
-    ask_broker_pos: int | None
+    ask_broker_pos: float | None
     order_id: int | None
-    order_volume: int | None
+    order_volume: float | None
 
     class Config:
         arbitrary_types_allowed = True
@@ -39,8 +38,8 @@ class BrokerQueueModel(CleanModel):
 # kdb q field map
 FIELD_MAP = {
     "code":         "sym",
-    "name":         "name",
     "time":         "time",
+    "name":         "name",
     "broker_id":    "brokerId",
     "broker_name":  "brokerName",
     "broker_pos":   "brokerPos",

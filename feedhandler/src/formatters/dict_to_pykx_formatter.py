@@ -6,9 +6,10 @@ import pykx as kx
 
 class DictToPykxFormatter:
     """
-    1) 从扁平化 dict 构造 pandas.DataFrame
-    2) 可选地把指定的 str 时间字段转成 pandas.Timestamp
-    3) 调用 pykx.toq，传入业务侧的 ktype 映射，生成 kdb+ Table
+    1) 可选地把指定的 str 时间字段转成 pandas.Timestamp
+    2) 从扁平化 dict 构造 pd.DataFrame
+    3) 根据field_map 重命名 并使用 field_map的顺序
+    4) 将 pd.DataFrame 转换成 pykx.Table 并做相应的ktype转化
     """
     def format(
             self,
@@ -26,8 +27,9 @@ class DictToPykxFormatter:
 
         df = pd.DataFrame([data])
 
-        if field_maps:
-            df.rename(columns=field_maps, inplace=True)
+        if field_map:
+            df.rename(columns=field_map, inplace=True)
+            df = df[field_map.keys()]
 
         if ktype:
             return kx.toq(df, ktype=ktype)

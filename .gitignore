@@ -39,6 +39,7 @@ tick/
 .qpc/
 samples/
 vanila_tick/
+FUTUHDB/
 
 #----------------------------------------
 # Python

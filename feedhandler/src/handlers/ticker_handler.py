@@ -44,7 +44,7 @@ class TickerHandlerImpl(TickerHandlerBase):
             tbl = self.formatter.format(
                 data,
                 ktype={
-                    'time': kx.TimestampAtom,
+                    'time': kx.TimestampVector,
                 },
                 time_fields=['time'],
                 field_map=self.field_map
@@ -54,7 +54,7 @@ class TickerHandlerImpl(TickerHandlerBase):
             return RET_ERROR, None
 
         try:
-            self.publisher.publish(tbl)
+            self.publisher.publish("Ticks", tbl)
         except Exception as e:
             logger.error("publish table failed: %s", e)
             return RET_ERROR, None

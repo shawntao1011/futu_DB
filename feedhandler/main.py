@@ -1,5 +1,7 @@
 # main.py
 import time
+from datetime import datetime
+
 from futu import OpenQuoteContext, RET_OK
 from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
@@ -8,6 +10,7 @@ from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
 from src.handlers.cur_kline_handler import CurKlineHandlerImpl
 from src.handlers.order_book_handler import OrderBookHandlerImpl
 from src.handlers.ticker_handler import TickerHandlerImpl
+from src.publishers.archive_publisher import ArchivePublisher
 from src.publishers.tp_publisher import TPPublisher
 from src.transformers.broker_queue_transformer import BrokerQueueTransformer
 from src.transformers.order_book_transformer import OrderBookTransformer
@@ -22,33 +25,34 @@ def main():
 
     dictToPykxFormatter = DictToPykxFormatter()
     dfToPykxFormatter = DFToPykxFormatter()
+    archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
 
     # order_book
     order_book = OrderBookHandlerImpl(
         transformer=OrderBookTransformer(),
         formatter=dictToPykxFormatter,
-        publisher=tpPublisher
+        publisher=archivePublisher
     )
 
     # minutes
     kline = CurKlineHandlerImpl(
         transformer=None,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=archivePublisher
     )
 
     # ticks
     tick = TickerHandlerImpl(
         transformer=None,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=archivePublisher
     )
 
     # broker queue
     broker = BrokerQueueHandlerImpl(
         transformer=BrokerQueueTransformer(),
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=archivePublisher
     )
 
 

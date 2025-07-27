@@ -1,5 +1,6 @@
 import logging
 from queue import Queue
+import pykx as kx
 
 
 class TPPublisher:
@@ -11,5 +12,5 @@ class TPPublisher:
         self.queue = queue or Queue()
         self.logger = logging.getLogger(__name__)
 
-    def publish(self, payload: any):
+    def publish(self, sym: str, data: kx.Table):
         raise NotImplementedError

@@ -1,4 +1,4 @@
-from src.models.clean_model import CleanModel
+from feedhandler.src.models.clean_model import CleanModel
 
 class TickerModel(CleanModel):
     code : str
@@ -6,7 +6,7 @@ class TickerModel(CleanModel):
     sequence : int
     time : str
     price : float
-    volume : int
+    volume : float
     turnover : float
     ticker_direction : str | None
     type : str | None
@@ -18,8 +18,8 @@ class TickerModel(CleanModel):
 
 FIELD_MAP = {
     "code"              :"sym",
-    "name"              :"name",
     "time"              :"time",
+    "name"              :"name",
     "price"             :"price",
     "volume"            :"volume",
     "turnover"          :"turnover",
