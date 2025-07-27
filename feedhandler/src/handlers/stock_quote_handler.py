@@ -9,8 +9,8 @@ from datetime import datetime
 from futu import StockQuoteHandlerBase, RET_OK, RET_ERROR
 from pydantic import ValidationError
 
-from src.models.stock_quote_model import StockQuoteModel
-from src.publishers.tp_publisher import TPPublisher
+from feedhandler.src.models.stock_quote_model import StockQuoteModel
+from feedhandler.src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
 

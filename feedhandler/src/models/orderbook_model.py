@@ -1,7 +1,7 @@
 from typing import Optional
 
-from src.models.clean_model import CleanModel
-from src.models.cur_kline_model import FIELD_MAP
+from feedhandler.src.models.clean_model import CleanModel
+from feedhandler.src.models.cur_kline_model import FIELD_MAP
 
 
 class OrderBookModel(CleanModel):

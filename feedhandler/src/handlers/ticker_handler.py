@@ -4,10 +4,10 @@ import pykx as kx
 from futu import TickerHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
-from src.models.ticker_model import TickerModel
-from src.models.ticker_model import FIELD_MAP as tick_field_map
-from src.publishers.tp_publisher import TPPublisher
+from feedhandler.src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from feedhandler.src.models.ticker_model import TickerModel
+from feedhandler.src.models.ticker_model import FIELD_MAP as tick_field_map
+from feedhandler.src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
 

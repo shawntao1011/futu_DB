@@ -5,8 +5,8 @@ from datetime import datetime
 
 from futu import RTDataHandlerBase, RET_OK, RET_ERROR
 
-from src.models.rt_data_model import RTDataModel
-from src.publishers.tp_publisher import TPPublisher
+from feedhandler.src.models.rt_data_model import RTDataModel
+from feedhandler.src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
 

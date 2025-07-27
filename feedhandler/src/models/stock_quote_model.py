@@ -1,4 +1,4 @@
-from src.models.clean_model import CleanModel
+from feedhandler.src.models.clean_model import CleanModel
 
 
 class StockQuoteModel(CleanModel):
