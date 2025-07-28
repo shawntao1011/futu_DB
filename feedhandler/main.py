@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from futu import OpenQuoteContext, RET_OK
-from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT
+from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT, TP_HOST, TP_PORT
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
 from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
@@ -21,12 +21,10 @@ def main():
     # 1. 建立连接，注册 Handler
     ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
 
-    tpPublisher = TPPublisher()
-
     dictToPykxFormatter = DictToPykxFormatter()
     dfToPykxFormatter = DFToPykxFormatter()
     # archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
-    tpPublisher = TPPublisher(TPHOST, TPPORT)
+    tpPublisher = TPPublisher(TP_HOST, TP_PORT)
 
     # order_book
     order_book = OrderBookHandlerImpl(

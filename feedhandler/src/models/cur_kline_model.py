@@ -1,6 +1,5 @@
 from src.models.clean_model import CleanModel
 
-
 class CurKlineModel(CleanModel):
     code : str
     name : str

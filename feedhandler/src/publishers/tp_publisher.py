@@ -1,14 +1,7 @@
-import asyncio
-import collections
 import logging
 import os
-import threading
-from typing import Callable
-
-import pandas as pd
 import pykx as kx
 from pykx import SyncQConnection
-
 
 class TPPublisher:
     """
@@ -77,7 +70,7 @@ class TPPublisher:
         :param wait:  override wait flag for this call
         """
         try:
-            self.conn('.u.upd', table, tbl, wait=wait)
+            self.conn('.u.upd', kx.toq(table), tbl, wait=wait)
         except Exception as e:
             self.logger.error(f"Failed to publish to '{table}': {e!r}", exc_info=True)
             if self.fallback_dir:
