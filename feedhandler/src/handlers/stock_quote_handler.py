@@ -9,8 +9,8 @@ from datetime import datetime
 from futu import StockQuoteHandlerBase, RET_OK, RET_ERROR
 from pydantic import ValidationError
 
-from feedhandler.src.models.stock_quote_model import StockQuoteModel
-from feedhandler.src.publishers.tp_publisher import TPPublisher
+from src.models.stock_quote_model import StockQuoteModel
+from src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,6 @@ class StockQuoteHandleImpl(StockQuoteHandlerBase):
         for rec in data.to_dict('records'):
             try:
                 sqm = StockQuoteModel(**rec)
-                print(sqm)
                 self._buffer_and_maybe_flush(sqm)
             except ValidationError as exc:
                 logger.warning("invalid stock quote record: %s", rec)

@@ -1,4 +1,4 @@
-from feedhandler.src.models.clean_model import CleanModel
+from src.models.clean_model import CleanModel
 
 
 class RTDataModel(CleanModel):

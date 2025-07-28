@@ -18,4 +18,3 @@ class FutuClient:
 
     def close(self):
         self.ctx.close()
-

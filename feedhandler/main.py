@@ -25,34 +25,35 @@ def main():
 
     dictToPykxFormatter = DictToPykxFormatter()
     dfToPykxFormatter = DFToPykxFormatter()
-    archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
+    # archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
+    tpPublisher = TPPublisher(TPHOST, TPPORT)
 
     # order_book
     order_book = OrderBookHandlerImpl(
         transformer=OrderBookTransformer(),
         formatter=dictToPykxFormatter,
-        publisher=archivePublisher
+        publisher=tpPublisher
     )
 
     # minutes
     kline = CurKlineHandlerImpl(
         transformer=None,
         formatter=dfToPykxFormatter,
-        publisher=archivePublisher
+        publisher=tpPublisher
     )
 
     # ticks
     tick = TickerHandlerImpl(
         transformer=None,
         formatter=dfToPykxFormatter,
-        publisher=archivePublisher
+        publisher=tpPublisher
     )
 
     # broker queue
     broker = BrokerQueueHandlerImpl(
         transformer=BrokerQueueTransformer(),
         formatter=dfToPykxFormatter,
-        publisher=archivePublisher
+        publisher=tpPublisher
     )
 
 

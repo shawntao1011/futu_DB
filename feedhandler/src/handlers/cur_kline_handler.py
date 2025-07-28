@@ -4,10 +4,10 @@ import pykx as kx
 from futu import CurKlineHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from feedhandler.src.formatters.df_to_pykx_formatter import DFToPykxFormatter
-from feedhandler.src.models.cur_kline_model import CurKlineModel
-from feedhandler.src.models.cur_kline_model import FIELD_MAP as ckline_field_map
-from feedhandler.src.publishers.tp_publisher import TPPublisher
+from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from src.models.cur_kline_model import CurKlineModel
+from src.models.cur_kline_model import FIELD_MAP as ckline_field_map
+from src.publishers.tp_publisher import TPPublisher
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
             tbl = self.formatter.format(
                 data,
                 ktype={
-                    'time': kx.TimestampVector,
+                    'time': kx.TimestampAtom,
                 },
                 time_fields=['time_key'],
                 field_map=self.field_map

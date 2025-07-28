@@ -25,7 +25,7 @@ class DFToPykxFormatter:
 
         if field_map:
             df.rename(columns=field_map, inplace=True)
-            df = df[field_map.keys()]
+            df = df[field_map.values()]
 
         if ktype:
             return kx.toq(df, ktype=ktype)

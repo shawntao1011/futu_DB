@@ -38,7 +38,7 @@ hdb/
 tick/
 .qpc/
 samples/
-vanila_tick/
+test_tick/
 FUTUHDB/
 
 #----------------------------------------

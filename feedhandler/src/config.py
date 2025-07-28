@@ -22,3 +22,7 @@ SUB_TYPES: list[str] = [
     SubType.ORDER_BOOK,
     SubType.BROKER,
 ]
+
+# TickerPlant 配置
+TP_HOST = '127.0.0.1'
+TP_PORT = 5010

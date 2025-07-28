@@ -1,3 +1,6 @@
+from typing import Optional
+
+import pandas as pd
 
 
 class OrderBookTransformer:
@@ -13,17 +16,37 @@ class OrderBookTransformer:
     def __init__(self, depth: int = 10):
         self.depth = depth
 
+    def pick_time_str(
+            self,
+            bid: Optional[str],
+            ask: Optional[str]
+    ) -> Optional[str]:
+        """
+        从两个 ISO 时间字符串中取最早的那个，若只有一个非 None 则返回它，
+        若都为 None 则返回 None。
+        """
+        if bid is None:
+            return ask
+        if ask is None:
+            return bid
+        # ISO 字符串可以直接字典序比较
+        return bid if bid <= ask else ask
+
     def pivot(self, raw: dict[str, any]):
 
         for key in ("code", "name", "svr_recv_time_bid", "svr_recv_time_ask", "Bid", "Ask"):
             if key not in raw:
                 raise ValueError(f"Missing required field: {key}")
 
+        bid_time_str = raw.get("svr_recv_time_bid")
+        ask_time_str = raw.get("svr_recv_time_ask")
+
         flat: dict[str, any] = {
             "code": raw["code"],
+            "time": self.pick_time_str(bid_time_str, ask_time_str),
             "name": raw["name"],
-            "svr_recv_time_bid": raw["svr_recv_time_bid"],
-            "svr_recv_time_ask": raw["svr_recv_time_ask"],
+            "svr_recv_time_bid": bid_time_str,
+            "svr_recv_time_ask": ask_time_str,
             "Bid": raw.get("Bid"),
             "Ask": raw.get("Ask")
         }
@@ -34,7 +57,7 @@ class OrderBookTransformer:
                 try:
                     price, volume, qty, _ = entries[i-1]
                 except IndexError:
-                    price, volume, qty, _ = None, None, None
+                    price, volume, qty, _ = None, None, None, None
 
                 flat[f"{side.lower()}{i}_price"] = price
                 flat[f"{side.lower()}{i}_volume"] = volume
