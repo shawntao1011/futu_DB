@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 
 import pandas as pd
 
@@ -32,7 +32,7 @@ class OrderBookTransformer:
         # ISO 字符串可以直接字典序比较
         return bid if bid <= ask else ask
 
-    def pivot(self, raw: dict[str, any]):
+    def flat(self, raw: dict[str, any]):
 
         for key in ("code", "name", "svr_recv_time_bid", "svr_recv_time_ask", "Bid", "Ask"):
             if key not in raw:
@@ -41,29 +41,37 @@ class OrderBookTransformer:
         bid_time_str = raw.get("svr_recv_time_bid")
         ask_time_str = raw.get("svr_recv_time_ask")
 
-        flat: dict[str, any] = {
-            "code": raw["code"],
-            "time": self.pick_time_str(bid_time_str, ask_time_str),
-            "name": raw["name"],
-            "svr_recv_time_bid": bid_time_str,
-            "svr_recv_time_ask": ask_time_str,
-            "Bid": raw.get("Bid"),
-            "Ask": raw.get("Ask")
-        }
+        code = raw["code"]
+        time = self.pick_time_str(bid_time_str, ask_time_str)
+        name = raw["name"]
 
-        for side in ("Bid", "Ask"):
-            entries = raw.get(side) or []
-            for i in range(1, self.depth + 1):
-                try:
-                    price, volume, qty, _ = entries[i-1]
-                except IndexError:
-                    price, volume, qty, _ = None, None, None, None
+        records: list[dict[str, Any]] = []
+        bids = raw.get("Bid") or []
+        asks = raw.get("Ask") or []
+        for lvl in range(1, self.depth + 1):
+            # 取第 lvl 档，IndexError 则补 None
+            try:
+                bp, bv, bq, _ = bids[lvl - 1]
+            except (IndexError, ValueError):
+                bp = bv = bq = None
+            try:
+                ap, av, aq, _ = asks[lvl - 1]
+            except (IndexError, ValueError):
+                ap = av = aq = None
 
-                flat[f"{side.lower()}{i}_price"] = price
-                flat[f"{side.lower()}{i}_volume"] = volume
-                flat[f"{side.lower()}{i}_qty"] = qty
+            records.append({
+                "code": code,
+                "name": name,
+                "time": time,
+                "svr_recv_time_bid": bid_time_str,
+                "svr_recv_time_ask": ask_time_str,
+                "level": lvl,
+                "bid_price": bp,
+                "bid_volume": bv,
+                "bid_qty": bq,
+                "ask_price": ap,
+                "ask_volume": av,
+                "ask_qty": aq,
+            })
 
-        flat.pop("Bid")
-        flat.pop("Ask")
-
-        return flat
+        return pd.DataFrame(records)
