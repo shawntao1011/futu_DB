@@ -3,13 +3,11 @@ import logging
 from futu import OrderBookHandlerBase, RET_ERROR, RET_OK
 from pydantic import ValidationError
 
-from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
+from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.models.orderbook_model import OrderBookModel
 from src.models.orderbook_model import FIELD_MAP as ob_field_map
 from src.publishers.tp_publisher import TPPublisher
 from src.transformers.order_book_transformer import OrderBookTransformer
-
-import pykx as kx
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +16,7 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
     def __init__(
             self,
             transformer: OrderBookTransformer,
-            formatter: DictToPykxFormatter,
+            formatter: DFToPykxFormatter,
             publisher: TPPublisher
     ):
         super().__init__()
@@ -44,7 +42,7 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
 
         # transform to flat table
         try:
-            flat = self.transformer.pivot(raw)
+            flat = self.transformer.flat(raw)
         except Exception as e:
             logger.error("transform to pivot dict failed: %s", e)
             return RET_ERROR, None
