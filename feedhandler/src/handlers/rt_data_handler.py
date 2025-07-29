@@ -20,7 +20,9 @@ class RTDataHandleImpl(RTDataHandlerBase):
         self.buffer: list[RTDataModel] = []
         self.current_minute: str = ""
 
+    # https://openapi.futunn.com/futu-api-doc/en/quote/update-rt.html
     def on_recv_rsp(self, rsp_pb):
+        # return data : DataFrame
         ret_code, data = super(RTDataHandleImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data

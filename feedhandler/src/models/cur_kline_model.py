@@ -20,8 +20,8 @@ class CurKlineModel(CleanModel):
 
 # kdb q field map
 FIELD_MAP = {
+    "time_key": "time",
     "code":         "sym",
-    "time_key":     "time",
     "name":         "name",
     "open":         "open",
     "close":        "close",

@@ -41,8 +41,8 @@ class OrderBookTransformer:
         bid_time_str = raw.get("svr_recv_time_bid")
         ask_time_str = raw.get("svr_recv_time_ask")
 
-        code = raw["code"]
         time = self.pick_time_str(bid_time_str, ask_time_str)
+        code = raw["code"]
         name = raw["name"]
 
         records: list[dict[str, Any]] = []

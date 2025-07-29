@@ -26,7 +26,9 @@ class TickerHandlerImpl(TickerHandlerBase):
 
         self.field_map = tick_field_map
 
+    # https://openapi.futunn.com/futu-api-doc/en/quote/update-ticker.html
     def on_recv_rsp(self, rsp_pb):
+        # return data : pd.DataFrame
         ret_code, data = super(TickerHandlerImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data

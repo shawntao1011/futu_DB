@@ -17,8 +17,8 @@ class TickerModel(CleanModel):
 
 
 FIELD_MAP = {
-    "code"              :"sym",
     "time"              :"time",
+    "code"              :"sym",
     "name"              :"name",
     "price"             :"price",
     "volume"            :"volume",

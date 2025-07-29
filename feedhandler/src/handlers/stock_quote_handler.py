@@ -23,8 +23,9 @@ class StockQuoteHandleImpl(StockQuoteHandlerBase):
 
         self.buffer: list[StockQuoteModel] = []
         self.current_minute: str = ""
-
+    # https://openapi.futunn.com/futu-api-doc/en/quote/update-stock-quote.html
     def on_recv_rsp(self, rsp_pb):
+        # return data : DataFrame
         ret_code, data = super(StockQuoteHandleImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data

@@ -27,7 +27,9 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
 
         self.field_map = bq_field_map
 
+    # https://openapi.futunn.com/futu-api-doc/quote/update-broker.html
     def on_recv_rsp(self, rsp_pb):
+        # return data: str, pd.DataFrame, pd.DataFrame
         ret_code, err_or_code, data = super(BrokerQueueHandlerImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data
@@ -40,6 +42,7 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
             return RET_ERROR, None
 
         try:
+            # data to flat dataframe
             df = self.transformer.flattern(data)
         except Exception as e:
             logger.error("transform to flat table failed: %s", e)

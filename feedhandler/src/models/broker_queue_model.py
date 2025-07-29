@@ -37,8 +37,8 @@ class BrokerQueueModel(CleanModel):
 
 # kdb q field map
 FIELD_MAP = {
-    "code":         "sym",
     "time":         "time",
+    "code":         "sym",
     "name":         "name",
     "broker_id":    "brokerId",
     "broker_name":  "brokerName",

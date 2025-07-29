@@ -6,10 +6,10 @@ import pykx as kx
 
 class DFToPykxFormatter:
     """
-    1) 从扁平化 dict 构造 pandas.DataFrame
-    2) 可选地把指定的 str 时间字段转成 pandas.Timestamp
-    3) 根据field_map 重命名 并使用 field_map的顺序
-    4) 调用 pykx.toq，传入业务侧的 ktype 映射，生成 kdb+ Table
+    1) 可选地把指定的 str 时间字段转成 pandas.Timestamp
+    2) 根据field_map 重命名 并使用 field_map的顺序
+    3) 调用 pykx.toq，传入业务侧的 ktype 映射，生成 kdb+ Table
+    4) 为了迎合 .u.upd 的 convention， 转化成 list of columns
     """
     def format(
             self,
@@ -27,8 +27,7 @@ class DFToPykxFormatter:
             df.rename(columns=field_map, inplace=True)
             df = df[field_map.values()]
 
-        if ktype:
-            return kx.toq(df, ktype=ktype)
-        else:
-            return kx.toq(df)
+        list_of_columns = df.values
+
+        return kx.toq(list_of_columns)
 

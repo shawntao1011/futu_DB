@@ -16,8 +16,8 @@ class OrderBookModel(CleanModel):
 
 # kdb column map to OrderBooks
 FIELD_MAP = {
-    "code"              :"sym",
     "time"              :"time",
+    "code"              :"sym",
     "svr_recv_time_bid" :"bidTime",
     "svr_recv_time_ask" :"askTime",
     "level"             :"level",

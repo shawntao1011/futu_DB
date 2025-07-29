@@ -26,8 +26,9 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
 
         self.field_map = ob_field_map
 
-
+    # https://openapi.futunn.com/futu-api-doc/en/quote/update-order-book.html
     def on_recv_rsp(self, rsp_pb):
+        # return type: dict
         ret_code, data = super(OrderBookHandlerImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data
@@ -42,6 +43,7 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
 
         # transform to flat table
         try:
+            # dict flat to dataframe
             flat = self.transformer.flat(raw)
         except Exception as e:
             logger.error("transform to pivot dict failed: %s", e)
@@ -52,7 +54,7 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
             record = self.formatter.format(
                 flat,
                 None,
-                time_fields=['svr_recv_time_bid', 'svr_recv_time_ask'],
+                time_fields=['time', 'svr_recv_time_bid', 'svr_recv_time_ask'],
                 field_map=self.field_map,
             )
         except Exception as e:
