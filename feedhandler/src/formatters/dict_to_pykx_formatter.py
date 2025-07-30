@@ -1,8 +1,8 @@
+from collections import OrderedDict
 from typing import Optional, Any
 
 import pandas as pd
 import pykx as kx
-
 
 class DictToPykxFormatter:
     """
@@ -16,7 +16,7 @@ class DictToPykxFormatter:
             ktype: Optional[dict[str, Any]] = None,
             time_fields: Optional[list[str]] = None,
             field_map: Optional[dict[str, str]] = None
-    ) -> kx.Table:
+    ) -> kx.List:
 
         if time_fields:
             for col in time_fields:
@@ -24,14 +24,21 @@ class DictToPykxFormatter:
                 if isinstance(val, str):
                     data[col] = pd.to_datetime(val)
 
-        df = pd.DataFrame([data])
-
         if field_map:
-            df.rename(columns=field_map, inplace=True)
-            df = df[field_map.values()]
+            reordered = {field_map[key]: data[key] for key in field_map.keys()}
+            data = reordered
 
-        if ktype:
-            return kx.toq(df, ktype=ktype)
-        else:
-            return kx.toq(df)
+        kx_dict = kx.toq(data)
+
+        common_keys = field_map.keys() & ktype.keys()
+        applied_ktype= {k: ktype[k] for k in common_keys}
+        if applied_ktype:
+            for k, v in applied_ktype.items():
+                if not isinstance(kx_dict.get(k), v):
+                    kx_dict[k] = kx.toq(kx_dict.get(k), ktype=v)
+
+        return kx_dict
+
+
+
 
