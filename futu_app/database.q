@@ -1,6 +1,5 @@
 Minutes:@[;`sym;`p#]
-    ([] time_recv   :0#0Np;
-        time        :0Np;
+    ([] time        :0#0Np;
         sym         :`;
         name        :`;
         open        :0n;
@@ -16,8 +15,7 @@ Minutes:@[;`sym;`p#]
     );
 
 Ticks:@[;`sym;`p#]
-    ([] time_recv   :0#0Np;
-        time        :0Np;
+    ([] time            :0#0Np;
         sym             :`;
         name            :`;
         price           :0n;
@@ -31,8 +29,7 @@ Ticks:@[;`sym;`p#]
 
 
 OrderBooks:@[;`sym;`p#]
-    ([] time_recv   :0#0Np;
-        time        :0Np;
+    ([] time        :0#0Np;
         sym         :`;
         bidTime     :0Np;
         askTime     :0Np;
@@ -46,8 +43,7 @@ OrderBooks:@[;`sym;`p#]
     );
 
 FlatBrokerQs:@[;`sym;`p#]
-    ([] time_recv   :0#0Np;
-        time        :0Np;
+    ([] time        :0#0Np;
         sym         :`;
         brokerID    :0n;
         brokerName  :`;

@@ -26,3 +26,9 @@ SUB_TYPES: list[str] = [
 # TickerPlant 配置
 TP_HOST = '127.0.0.1'
 TP_PORT = 5010
+
+# TorQ 配置
+STP_HOST = '127.0.0.1'
+STP_PORT = 6000
+STP_USER = 'feed'
+STP_PASS = 'pass'
