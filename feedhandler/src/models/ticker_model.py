@@ -24,6 +24,7 @@ FIELD_MAP = {
     "volume"            :"volume",
     "turnover"          :"turnover",
     "ticker_direction"  :"tickDirection",
+    "sequence"          :"sequence",
     "type"              :"tickType",
     "push_data_type"    :"srcType",
 }

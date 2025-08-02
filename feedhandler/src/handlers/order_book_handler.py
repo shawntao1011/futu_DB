@@ -3,6 +3,7 @@ import logging
 from futu import OrderBookHandlerBase, RET_ERROR, RET_OK
 from pydantic import ValidationError
 
+import pykx as kx
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.models.orderbook_model import OrderBookModel
 from src.models.orderbook_model import FIELD_MAP as ob_field_map
@@ -53,7 +54,9 @@ class OrderBookHandlerImpl(OrderBookHandlerBase):
         try:
             record = self.formatter.format(
                 flat,
-                None,
+                ktype={
+                    'level': kx.IntVector,
+                },
                 time_fields=['time', 'svr_recv_time_bid', 'svr_recv_time_ask'],
                 field_map=self.field_map,
             )

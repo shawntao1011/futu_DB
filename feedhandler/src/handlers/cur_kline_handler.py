@@ -1,4 +1,6 @@
 import logging
+
+import pandas as pd
 import pykx as kx
 
 from futu import CurKlineHandlerBase, RET_OK, RET_ERROR
@@ -34,17 +36,19 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
             return RET_ERROR, data
 
         try:
-            parse_obj_as(list[CurKlineModel], data.to_dict('records'))
+            models: list[CurKlineModel] = parse_obj_as(list[CurKlineModel], data.to_dict('records'))
         except ValidationError as err:
             logger.warning("invalid curkline record: %s", data)
             return RET_ERROR, None
+
+        records = [m.dict() for m in models]
 
         # no need to transform
 
         # format to pykx table
         try:
             tbl = self.formatter.format(
-                data,
+                pd.DataFrame.from_records(records),
                 ktype={
                     'time': kx.TimestampAtom,
                 },

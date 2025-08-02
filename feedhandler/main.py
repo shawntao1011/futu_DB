@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from futu import OpenQuoteContext, RET_OK
-from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT, TP_HOST, TP_PORT
+from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT, TP_HOST, TP_PORT, STP_HOST, STP_PORT, STP_USER, STP_PASS
 from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
 from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
 from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
@@ -29,7 +29,7 @@ def main():
     # order_book
     order_book = OrderBookHandlerImpl(
         transformer=OrderBookTransformer(),
-        formatter=dictToPykxFormatter,
+        formatter=dfToPykxFormatter,
         publisher=tpPublisher
     )
 

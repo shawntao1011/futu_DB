@@ -1,4 +1,6 @@
 import logging
+
+import pandas as pd
 import pykx as kx
 
 from futu import BrokerHandlerBase, RET_OK, RET_ERROR
@@ -29,21 +31,29 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
 
     # https://openapi.futunn.com/futu-api-doc/quote/update-broker.html
     def on_recv_rsp(self, rsp_pb):
-        # return data: str, pd.DataFrame, pd.DataFrame
+        # return data: pd.DataFrame, pd.DataFrame !!! Conflict with Futu Docs
         ret_code, err_or_code, data = super(BrokerQueueHandlerImpl, self).on_recv_rsp(rsp_pb)
         if ret_code != RET_OK:
             return RET_ERROR, data
 
+        # data[0] 是 bid_frame_table (pandas.DataFrame), data[1] 是 ask_frame_table
+        bid_df = data[0].to_dict("records")
+        ask_df = data[1].to_dict("records")
+
         try:
-            parse_obj_as(list[BrokerBidEntry], data[0].to_dict('records'))
-            parse_obj_as(list[BrokerAskEntry], data[1].to_dict('records'))
+            bids = parse_obj_as(list[BrokerBidEntry], bid_df)
+            asks = parse_obj_as(list[BrokerAskEntry], ask_df)
         except ValidationError as err:
             logger.warning("invalid order queue record: %s", data)
             return RET_ERROR, None
 
+        bid_dicts = [b.dict() for b in bids]
+        ask_dicts = [a.dict() for a in asks]
+        parsed_data = (pd.DataFrame(bid_dicts), pd.DataFrame(ask_dicts))
+
         try:
             # data to flat dataframe
-            df = self.transformer.flattern(data)
+            df = self.transformer.flattern(parsed_data)
         except Exception as e:
             logger.error("transform to flat table failed: %s", e)
             return RET_ERROR, None
@@ -52,7 +62,7 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
             tbl = self.formatter.format(
                 df,
                 ktype={
-                    'time': kx.TimestampAtom,
+                    'time': kx.TimestampVector,
                 },
                 time_fields=['time'],
                 field_map=self.field_map

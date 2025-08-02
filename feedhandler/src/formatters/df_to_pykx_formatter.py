@@ -27,16 +27,18 @@ class DFToPykxFormatter:
             df.rename(columns=field_map, inplace=True)
             df = df[field_map.values()]
 
-        list_of_columns = kx.toq(df.values)
+        list_of_columns = kx.toq(df.values.T)
 
         field_map_ids = {k: i for i, k in enumerate(field_map.keys())}
-        common_keys = field_map.keys() & ktype.keys()
 
-        applied_ktype = { field_map_ids[k]: ktype[k] for k in common_keys }
-        if applied_ktype:
-            for k, v in applied_ktype.items():
-                if not isinstance(list_of_columns[k], v):
-                    list_of_columns[k] = kx.toq(list_of_columns[k], ktype=v)
+        if ktype:
+            common_keys = field_map.keys() & ktype.keys()
+
+            applied_ktype = { field_map_ids[k]: ktype[k] for k in common_keys }
+            if applied_ktype:
+                for k, v in applied_ktype.items():
+                    if not isinstance(list_of_columns[k], v):
+                        list_of_columns[k] = kx.toq(list_of_columns[k], ktype=v)
 
         return list_of_columns
 

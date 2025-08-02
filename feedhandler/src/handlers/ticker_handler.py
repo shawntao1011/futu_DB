@@ -1,4 +1,6 @@
 import logging
+
+import pandas as pd
 import pykx as kx
 
 from futu import TickerHandlerBase, RET_OK, RET_ERROR
@@ -34,19 +36,20 @@ class TickerHandlerImpl(TickerHandlerBase):
             return RET_ERROR, data
 
         try:
-            parse_obj_as(list[TickerModel], data.to_dict('records'))
+            models: list[TickerModel] = parse_obj_as(list[TickerModel], data.to_dict('records'))
         except ValidationError as err:
             logger.warning("invalid tick record: %s", data)
             return RET_ERROR, None
 
+        records = [m.dict() for m in models]
         # no need to transform
 
         # format to pykx table
         try:
             tbl = self.formatter.format(
-                data,
+                pd.DataFrame.from_records(records),
                 ktype={
-                    'time': kx.TimestampAtom,
+                    'time': kx.TimestampVector,
                 },
                 time_fields=['time'],
                 field_map=self.field_map

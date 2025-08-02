@@ -8,8 +8,8 @@ class OrderBookModel(CleanModel):
     name : str
     svr_recv_time_bid : str | None
     svr_recv_time_ask : str | None
-    Bid: Optional[list[tuple[float, int, int, dict]]]
-    Ask: Optional[list[tuple[float, int, int, dict]]]
+    Bid: list[tuple[float, float, float, dict]] | None
+    Ask: list[tuple[float, float, float, dict]] | None
 
     class Config:
         arbitrary_types_allowed = True
@@ -18,6 +18,7 @@ class OrderBookModel(CleanModel):
 FIELD_MAP = {
     "time"              :"time",
     "code"              :"sym",
+    "name"              :"name",
     "svr_recv_time_bid" :"bidTime",
     "svr_recv_time_ask" :"askTime",
     "level"             :"level",

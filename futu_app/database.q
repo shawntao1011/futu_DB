@@ -31,20 +31,23 @@ Ticks:@[;`sym;`p#]
 OrderBooks:@[;`sym;`p#]
     ([] time        :0#0Np;
         sym         :`;
+        name        :`;
         bidTime     :0Np;
         askTime     :0Np;
+        level       :0Ni;
         askPrice    :0n;
         askVolume   :0n;
         askqty      :0n;
         bidPrice    :0n;
         bidVolume   :0n;
-        bidqty      :0n;
-        level       :0Ni
+        bidqty      :0n
+
     );
 
 FlatBrokerQs:@[;`sym;`p#]
     ([] time        :0#0Np;
         sym         :`;
+        name        :`;
         brokerID    :0n;
         brokerName  :`;
         brokerPos   :0n;
