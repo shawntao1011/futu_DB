@@ -6,7 +6,7 @@ class TickerModel(CleanModel):
     sequence : int
     time : str
     price : float
-    volume : float
+    volume : int
     turnover : float
     ticker_direction : str | None
     type : str | None
@@ -14,7 +14,6 @@ class TickerModel(CleanModel):
 
     class Config:
         arbitrary_types_allowed = True
-
 
 FIELD_MAP = {
     "time"              :"time",

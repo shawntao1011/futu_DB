@@ -3,9 +3,10 @@ import time
 from datetime import datetime
 
 from futu import OpenQuoteContext, RET_OK
+
+from src.cleaners.dataframe_cleaner import DataFrameCleaner
 from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT, TP_HOST, TP_PORT, STP_HOST, STP_PORT, STP_USER, STP_PASS
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
-from src.formatters.dict_to_pykx_formatter import DictToPykxFormatter
+from src.formatters.df_to_updx_formatter import DFToUpdXFormatter
 from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
 from src.handlers.cur_kline_handler import CurKlineHandlerImpl
 from src.handlers.order_book_handler import OrderBookHandlerImpl
@@ -21,14 +22,18 @@ def main():
     # 1. 建立连接，注册 Handler
     ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
 
-    dictToPykxFormatter = DictToPykxFormatter()
-    dfToPykxFormatter = DFToPykxFormatter()
+    dataframeClearner = DataFrameCleaner()
+
+    dfToPykxFormatter = DFToUpdXFormatter()
+
     # archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
     tpPublisher = TPPublisher(TP_HOST, TP_PORT)
+
 
     # order_book
     order_book = OrderBookHandlerImpl(
         transformer=OrderBookTransformer(),
+        cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
         publisher=tpPublisher
     )
@@ -36,6 +41,7 @@ def main():
     # minutes
     kline = CurKlineHandlerImpl(
         transformer=None,
+        cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
         publisher=tpPublisher
     )
@@ -43,6 +49,7 @@ def main():
     # ticks
     tick = TickerHandlerImpl(
         transformer=None,
+        cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
         publisher=tpPublisher
     )
@@ -50,6 +57,7 @@ def main():
     # broker queue
     broker = BrokerQueueHandlerImpl(
         transformer=BrokerQueueTransformer(),
+        cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
         publisher=tpPublisher
     )

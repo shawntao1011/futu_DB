@@ -8,7 +8,7 @@ class CurKlineModel(CleanModel):
     close : float
     high : float
     low : float
-    volume : float
+    volume : int
     turnover : float
     pe_ratio : float
     turnover_rate : float
@@ -20,7 +20,7 @@ class CurKlineModel(CleanModel):
 
 # kdb q field map
 FIELD_MAP = {
-    "time_key": "time",
+    "time_key":     "time",
     "code":         "sym",
     "name":         "name",
     "open":         "open",

@@ -6,7 +6,8 @@ import pykx as kx
 from futu import TickerHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from src.cleaners.dataframe_cleaner import DataFrameCleaner
+from src.formatters.df_to_updx_formatter import DFToUpdXFormatter
 from src.models.ticker_model import TickerModel
 from src.models.ticker_model import FIELD_MAP as tick_field_map
 from src.publishers.tp_publisher import TPPublisher
@@ -18,13 +19,15 @@ class TickerHandlerImpl(TickerHandlerBase):
     def __init__(
             self,
             transformer: None,
-            formatter: DFToPykxFormatter,
+            cleaner: DataFrameCleaner,
+            formatter: DFToUpdXFormatter,
             publisher: TPPublisher
     ):
         super().__init__()
         self.transformer = transformer
         self.formatter = formatter
         self.publisher = publisher
+        self.cleaner = cleaner
 
         self.field_map = tick_field_map
 
@@ -41,17 +44,33 @@ class TickerHandlerImpl(TickerHandlerBase):
             logger.warning("invalid tick record: %s", data)
             return RET_ERROR, None
 
-        records = [m.dict() for m in models]
+        df = pd.DataFrame.from_records([m.dict() for m in models])
         # no need to transform
+
+        # clean data
+        cleaned_df = self.cleaner.clean(
+            df,
+            {
+                'time': 'datetime64[ns]',
+                'code': 'string',
+                'name': 'string',
+                'price': 'float',
+                'volume': 'float',
+                'turnover': 'float',
+                'ticker_direction': 'string',
+                'sequence': 'Int64',
+                'type': 'string',
+                'push_data_type': 'string'
+            }
+        )
 
         # format to pykx table
         try:
             tbl = self.formatter.format(
-                pd.DataFrame.from_records(records),
+                cleaned_df,
                 ktype={
                     'time': kx.TimestampVector,
                 },
-                time_fields=['time'],
                 field_map=self.field_map
             )
         except Exception as e:

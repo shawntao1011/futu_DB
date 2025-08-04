@@ -6,9 +6,9 @@ class BrokerBidEntry(CleanModel):
     name: str                   # 证券名称
     bid_broker_id: int | None   # 买方经纪商 ID
     bid_broker_name: str | None # 买方经纪商名称
-    bid_broker_pos: float | None  # 买方席位级别
+    bid_broker_pos: int| None  # 买方席位级别
     order_id: int | None        # 交易所订单号
-    order_volume: float | None    # 订单未成交量
+    order_volume: int | None    # 订单未成交量
 
     class Config:
         arbitrary_types_allowed = True
@@ -19,9 +19,9 @@ class BrokerAskEntry(CleanModel):
     name: str
     ask_broker_id: int | None
     ask_broker_name: str | None
-    ask_broker_pos: float | None
+    ask_broker_pos: int | None
     order_id: int | None
-    order_volume: float | None
+    order_volume: int | None
 
     class Config:
         arbitrary_types_allowed = True

@@ -4,7 +4,7 @@ from typing import Optional, Any
 import pandas as pd
 import pykx as kx
 
-class DictToPykxFormatter:
+class DictToUpdXFormatter:
     """
     1) 可选地把指定的 str 时间字段转成 pandas.Timestamp
     2) 根据field_map 重命名 并使用 field_map的顺序

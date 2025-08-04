@@ -6,7 +6,8 @@ import pykx as kx
 from futu import CurKlineHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from src.cleaners.dataframe_cleaner import DataFrameCleaner
+from src.formatters.df_to_updx_formatter import DFToUpdXFormatter
 from src.models.cur_kline_model import CurKlineModel
 from src.models.cur_kline_model import FIELD_MAP as ckline_field_map
 from src.publishers.tp_publisher import TPPublisher
@@ -18,11 +19,13 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
     def __init__(
             self,
             transformer: None,
-            formatter: DFToPykxFormatter,
+            cleaner: DataFrameCleaner,
+            formatter: DFToUpdXFormatter,
             publisher: TPPublisher
     ):
         super().__init__()
         self.transformer = transformer
+        self.cleaner = cleaner
         self.formatter = formatter
         self.publisher = publisher
 
@@ -41,18 +44,32 @@ class CurKlineHandlerImpl(CurKlineHandlerBase):
             logger.warning("invalid curkline record: %s", data)
             return RET_ERROR, None
 
-        records = [m.dict() for m in models]
-
         # no need to transform
+
+        df = pd.DataFrame.from_records([m.dict() for m in models])
+        # clean and parse necessary data
+        cleaned_df = self.cleaner.clean(
+            df,
+            {
+                'time_key': 'datetime64[ns]',
+                'code': 'string',
+                'name': 'string',
+                'open': 'float64',
+                'close': 'float64',
+                'high': 'float64',
+                'low': 'float64',
+                'volume': 'float64',
+                'turnover': 'float64',
+                'k_type': 'string'
+            })
 
         # format to pykx table
         try:
             tbl = self.formatter.format(
-                pd.DataFrame.from_records(records),
+                cleaned_df,
                 ktype={
                     'time': kx.TimestampAtom,
                 },
-                time_fields=['time_key'],
                 field_map=self.field_map
             )
         except Exception as e:

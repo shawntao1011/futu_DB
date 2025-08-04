@@ -32,26 +32,25 @@ OrderBooks:@[;`sym;`p#]
     ([] time        :0#0Np;
         sym         :`;
         name        :`;
-        bidTime     :0Np;
-        askTime     :0Np;
         level       :0Ni;
-        askPrice    :0n;
-        askVolume   :0n;
-        askqty      :0n;
+        bidTime     :0Np;
         bidPrice    :0n;
         bidVolume   :0n;
-        bidqty      :0n
-
+        bidqty      :0n;
+        askTime     :0Np;
+        askPrice    :0n;
+        askVolume   :0n;
+        askqty      :0n
     );
 
 FlatBrokerQs:@[;`sym;`p#]
     ([] time        :0#0Np;
         sym         :`;
         name        :`;
-        brokerID    :0n;
+        brokerID    :0Nj;
         brokerName  :`;
-        brokerPos   :0n;
-        orderID     :0n;
+        brokerPos   :0Ni;
+        orderID     :0Nj;
         orderVolume :0n;
         side        :`
     );

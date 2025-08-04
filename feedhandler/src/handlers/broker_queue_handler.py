@@ -6,7 +6,8 @@ import pykx as kx
 from futu import BrokerHandlerBase, RET_OK, RET_ERROR
 from pydantic import parse_obj_as, ValidationError
 
-from src.formatters.df_to_pykx_formatter import DFToPykxFormatter
+from src.cleaners.dataframe_cleaner import DataFrameCleaner
+from src.formatters.df_to_updx_formatter import DFToUpdXFormatter
 from src.models.broker_queue_model import BrokerBidEntry, BrokerAskEntry
 from src.models.broker_queue_model import FIELD_MAP as bq_field_map
 from src.publishers.tp_publisher import TPPublisher
@@ -19,13 +20,15 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
     def __init__(
             self,
             transformer: BrokerQueueTransformer,
-            formatter: DFToPykxFormatter,
+            cleaner: DataFrameCleaner,
+            formatter: DFToUpdXFormatter,
             publisher: TPPublisher
     ):
         super().__init__()
         self.transformer = transformer
         self.formatter = formatter
         self.publisher = publisher
+        self.cleaner = cleaner
 
         self.field_map = bq_field_map
 
@@ -58,13 +61,26 @@ class BrokerQueueHandlerImpl(BrokerHandlerBase):
             logger.error("transform to flat table failed: %s", e)
             return RET_ERROR, None
 
+        cleaned_df = self.cleaner.clean(
+            df,
+            {
+                'time': 'datetime64[ns]',
+                'code': 'string',
+                'name': 'string',
+                'broker_id': 'Int64',
+                'broker_name': 'string',
+                'broker_pos': 'Int32',
+                'order_id': 'Int64',
+                'order_volume': 'float64',
+                'side': 'string'
+            })
+
         try:
             tbl = self.formatter.format(
                 df,
                 ktype={
                     'time': kx.TimestampVector,
                 },
-                time_fields=['time'],
                 field_map=self.field_map
             )
         except Exception as e:
