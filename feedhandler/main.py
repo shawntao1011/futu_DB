@@ -1,11 +1,23 @@
 # main.py
+import logging
 import time
 from datetime import datetime
 
 from futu import OpenQuoteContext, RET_OK
 
 from src.cleaners.dataframe_cleaner import DataFrameCleaner
-from src.config import SYMBOLS, SUB_TYPES, OPEND_HOST, OPEND_PORT, TP_HOST, TP_PORT, STP_HOST, STP_PORT, STP_USER, STP_PASS
+from src.config import (
+    SYMBOLS,
+    SUB_TYPES,
+    OPEND_HOST,
+    OPEND_PORT,
+    TP_HOST,
+    TP_PORT,
+    STP_HOST,
+    STP_PORT,
+    STP_USER,
+    STP_PASS,
+)
 from src.formatters.df_to_updx_formatter import DFToUpdXFormatter
 from src.handlers.broker_queue_handler import BrokerQueueHandlerImpl
 from src.handlers.cur_kline_handler import CurKlineHandlerImpl
@@ -18,16 +30,26 @@ from src.transformers.order_book_transformer import OrderBookTransformer
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    logger = logging.getLogger(__name__)
 
     # 1. 建立连接，注册 Handler
+    logger.info("Connecting to OpenD %s:%s", OPEND_HOST, OPEND_PORT)
     ctx = OpenQuoteContext(host=OPEND_HOST, port=OPEND_PORT)
 
     dataframeClearner = DataFrameCleaner()
-
     dfToPykxFormatter = DFToUpdXFormatter()
 
     # archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
-    tpPublisher = TPPublisher(TP_HOST, TP_PORT)
+    logger.info("Initialising TPPublisher %s:%s", TP_HOST, TP_PORT)
+    try:
+        tpPublisher = TPPublisher(TP_HOST, TP_PORT)
+    except Exception:
+        logger.exception("Failed to initialise TPPublisher")
+        return
 
 
     # order_book
@@ -64,29 +86,32 @@ def main():
 
 
     # set all callbacks
+    logger.info("Registering handlers")
     ctx.set_handler(order_book)
     ctx.set_handler(kline)
     ctx.set_handler(tick)
     ctx.set_handler(broker)
 
     # 2. 一次性订阅所有类型
+    logger.info("Subscribing to %s %s", SYMBOLS, SUB_TYPES)
     ret, err = ctx.subscribe(SYMBOLS, SUB_TYPES)
     if ret != RET_OK:
-        print("Subscribe failed:", err)
+        logger.error("Subscribe failed: %s", err)
         return
 
-    print("⏳ 订阅成功，开始接收推送")
     # 3. 启动接收（内部会自动 spawn 线程）
+    logger.info("Subscription succeeded, starting context")
     ctx.start()
 
-    print("▶️ 运行中…按 Ctrl+C 停止")
+    logger.info("Running… press Ctrl+C to stop")
     try:
         while True:
             time.sleep(1)  # 每秒醒一次，可做心跳或状态打印
     except KeyboardInterrupt:
-        print("🛑 程序中断，正在关闭…")
+        logger.info("Interrupted, shutting down…")
     finally:
         ctx.close()
+        logger.info("Context closed")
 
 if __name__ == "__main__":
     main()

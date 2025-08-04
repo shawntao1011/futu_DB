@@ -37,21 +37,27 @@ class TPPublisher:
     ) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
 
-        self.conn = SyncQConnection(
-            host=host,
-            port=port,
-            username=username,
-            password=password,
-            timeout=timeout,
-            large_messages=large_messages,
-            tls=tls,
-            unix=unix,
-            wait=wait,
-            no_ctx=no_ctx,
-            reconnection_attempts=reconnection_attempts,
-            reconnection_delay=reconnection_delay,
-            reconnection_function=reconnection_function
-        )
+        self.logger.info("Connecting to tickerplant %s:%s", host, port)
+        try:
+            self.conn = SyncQConnection(
+                host=host,
+                port=port,
+                username=username,
+                password=password,
+                timeout=timeout,
+                large_messages=large_messages,
+                tls=tls,
+                unix=unix,
+                wait=wait,
+                no_ctx=no_ctx,
+                reconnection_attempts=reconnection_attempts,
+                reconnection_delay=reconnection_delay,
+                reconnection_function=reconnection_function
+            )
+        except Exception as e:
+            self.logger.error(f'Failed to connect to tickerplant {host}:{port}: {e}')
+        self.logger.info("TPPublisher connected to %s:%s", host, port)
+
         self.fallback_dir = fallback_dir
         if fallback_dir:
             os.makedirs(fallback_dir, exist_ok=True)
@@ -69,8 +75,11 @@ class TPPublisher:
         :param tbl:   pykx.Table instance
         :param wait:  override wait flag for this call
         """
+        rows = len(tbl)
+        self.logger.info("Publishing %d rows to '%s'", rows, table)
         try:
             self.conn('.u.upd', kx.toq(table), tbl, wait=wait)
+            self.logger.debug("Published %d rows to '%s'", rows, table)
         except Exception as e:
             self.logger.error(f"Failed to publish to '{table}': {e!r}", exc_info=True)
             if self.fallback_dir:
