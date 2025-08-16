@@ -75,7 +75,7 @@ class TPPublisher:
         :param tbl:   pykx.Table instance
         :param wait:  override wait flag for this call
         """
-        rows = len(tbl)
+        rows = len(tbl[0])
         self.logger.info("Publishing %d rows to '%s'", rows, table)
         try:
             self.conn('.u.upd', kx.toq(table), tbl, wait=wait)
