@@ -24,17 +24,67 @@ from src.handlers.cur_kline_handler import CurKlineHandlerImpl
 from src.handlers.order_book_handler import OrderBookHandlerImpl
 from src.handlers.ticker_handler import TickerHandlerImpl
 from src.publishers.archive_publisher import ArchivePublisher
+from src.publishers.fanout_publisher import FanoutPublisher, SinkConfig
+from src.publishers.torq_publisher import TorQPublisher
 from src.publishers.tp_publisher import TPPublisher
 from src.transformers.broker_queue_transformer import BrokerQueueTransformer
 from src.transformers.order_book_transformer import OrderBookTransformer
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+def build_publisher():
+    # sink 1
+    tp = TPPublisher(host=TP_HOST, port=TP_PORT)
+
+    tp_connect = getattr(tp, "connect", None) or getattr(tp, "start", None)
+    tp_ready = getattr(tp, "is_connected", None) or getattr(tp, "ping", None)
+    tp_close = getattr(tp, "close", None)
+
+    # sink 2
+    stp = TorQPublisher(host=STP_HOST, port=STP_PORT, username=STP_USER, password=STP_PASS)
+
+    stp_connect = getattr(tp, "connect", None) or getattr(tp, "start", None)
+    stp_ready = getattr(tp, "is_connected", None) or getattr(tp, "ping", None)
+    stp_close = getattr(tp, "close", None)
+
+    return FanoutPublisher(
+        sinks=[
+            SinkConfig(
+                name='vanila_tp',
+                publish_fn=tp.publish,
+                connect_fn=None,
+                is_ready_fn=None,
+                close_fn=tp_close,
+                max_queue=20000,
+                retry_times=1,
+                reconnect_initial_s=0.5,
+                reconnect_max_s=5.0,
+                recoverable=(ConnectionError, TimeoutError, BrokenPipeError, OSError),
+                requeue_on_failure=False,
+            ),
+            SinkConfig(
+                name='torq_stp',
+                publish_fn=stp.publish,
+                connect_fn=None,
+                is_ready_fn=None,
+                close_fn=stp_close,
+                max_queue=20000,
+                retry_times=1,
+                reconnect_initial_s=0.5,
+                reconnect_max_s=5.0,
+                recoverable=(ConnectionError, TimeoutError, BrokenPipeError, OSError),
+                requeue_on_failure=False,
+            )
+        ],
+        drop_policy='drop_oldest'
+    )
 
 def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
-    logger = logging.getLogger(__name__)
 
     # 1. 建立连接，注册 Handler
     logger.info("Connecting to OpenD %s:%s", OPEND_HOST, OPEND_PORT)
@@ -43,21 +93,14 @@ def main():
     dataframeClearner = DataFrameCleaner()
     dfToPykxFormatter = DFToUpdXFormatter()
 
-    # archivePublisher = ArchivePublisher(f'samples/{datetime.now().strftime("%Y%m%d")}Feed')
-    logger.info("Initialising TPPublisher %s:%s", TP_HOST, TP_PORT)
-    try:
-        tpPublisher = TPPublisher(TP_HOST, TP_PORT)
-    except Exception:
-        logger.exception("Failed to initialise TPPublisher")
-        return
-
+    publisher = build_publisher()
 
     # order_book
     order_book = OrderBookHandlerImpl(
         transformer=OrderBookTransformer(),
         cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=publisher
     )
 
     # minutes
@@ -65,7 +108,7 @@ def main():
         transformer=None,
         cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=publisher
     )
 
     # ticks
@@ -73,7 +116,7 @@ def main():
         transformer=None,
         cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=publisher
     )
 
     # broker queue
@@ -81,7 +124,7 @@ def main():
         transformer=BrokerQueueTransformer(),
         cleaner=dataframeClearner,
         formatter=dfToPykxFormatter,
-        publisher=tpPublisher
+        publisher=publisher
     )
 
 
